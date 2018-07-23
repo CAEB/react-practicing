@@ -1,0 +1,89 @@
+/* 棋盘 2 64 2048 得分 操作按钮 背景色 */
+@2c: #2c98f0; 
+/* 棋盘 4 128 背景色 */
+@4c: #50ac55;
+/* 棋盘 8 256 背景色 */
+@8c: #cddb4a;
+/*  棋盘 16 512 背景色 */
+@16c: #fd5457;
+/* 棋盘 32 1024 背景色 */
+@32c: #e52463;
+/* 棋盘 无数字 背景色 */
+@0c: #303030;
+
+.color0 {
+    background: @0c;
+}
+.color2 {
+    background: @2c;
+}
+.color4 {
+    background: @4c;
+}
+.color8 {
+    background: @8c;
+}
+.color16 {
+    background: @16c;
+}
+.color32 {
+    background: @32c;
+}
+.game2048 {
+    width: 600px;
+    margin: 20px auto;
+    .game-left {
+        width: 210px;
+        .gameSquare {
+            width: 100%;
+            .row {
+                width: 100%;
+                margin-bottom: 2px;
+                .gameSquares {
+                    width: 50px;
+                    height: 50px;
+                    text-align: center;
+                    line-height: 50px;
+                    border-radius: 5px;
+                    color: #fff;
+                }
+            }
+        }
+    }
+    .game-right {
+       width: 390px;
+       .score {
+           width: 100%;
+           >div {
+               width: 100px;
+               height: 30px;
+               line-height: 30px;
+               padding: 0 5px;
+               color: #fff;
+               border-radius: 5px;
+           }
+       }
+       .handle-btn {
+           width: 160px;
+           margin: 140px auto 0px auto;
+           position: relative;
+           .btn:nth-child(1) {
+               position: absolute;
+               top: -35px;
+               left: 55px;
+           }
+           .btn {
+               width: 50px;
+               height: 30px;
+               line-height: 30px;
+               text-align: center;
+               color: #fff;
+               border-radius: 5px;
+               cursor: pointer;
+           }
+       }
+    }
+}
+
+
+
