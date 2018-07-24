@@ -3,9 +3,64 @@ import React from 'react'
 import './index.less'
 
 // 生成随机坐标
-const randomCoor = () => [Math.floor(Math.random() * 4),Math.floor(Math.random() * 4)]
-
-
+const randomCoor = (start,end) => [Math.floor(Math.random() * (end - start) + start),Math.floor(Math.random() * 4)]
+// 游戏的主逻辑 包括得分
+const handleSquare = squares => {
+    var score = 0
+    for (let i = 0; i < 3; i ++) {
+        let current1 = squares[i]
+        if (Number(squares[i]) === 0) {
+            squares[i] = squares[i + 1]
+            squares[i + 1] = current1
+        }
+    }
+    for (let i = 0; i < 3; i ++) {
+        let current2 = squares[i]
+        if (Number(squares[i]) === 0) {
+            squares[i] = squares[i + 1]
+            squares[i + 1] = current2
+        }
+    }
+    for (let i = 0; i < 3; i ++) {
+        let current3 = squares[i]
+        if (Number(squares[i]) === 0) {
+            squares[i] = squares[i + 1]
+            squares[i + 1] = current3
+        }
+    }
+    for (let i = 0; i < 3; i ++) {
+        if ( Number(squares[i]) !==0 && squares[i] === squares[i + 1]) {
+            squares[i] = squares[i] + squares[i + 1]
+            squares[i + 1] = null
+            score += squares[i]
+        }
+    }
+    return score
+}
+// 上下左右操作时生成的新的数据源
+const newState = squares => {
+    let newArr = [
+        [],[],[],[]
+    ]
+    squares.forEach((value,index) => {
+        value.forEach((value_i,index_i) => {
+            newArr[index].push(squares[index_i][index])
+        })
+    })
+    return newArr
+}
+// 数字合并后生成随机坐标
+const handleCoor = squares => {
+    let arr = []
+    squares.forEach((value,index) => {
+        value.forEach((value_i,index_i) => {
+            if (Number(value_i) === 0) {
+                arr.push([index,index_i])
+            }
+        })
+    })
+    return arr[Math.floor(Math.random() * arr.length)]
+}
 // 得分
 class Score extends React.Component {
 
@@ -13,7 +68,7 @@ class Score extends React.Component {
         return (
             <div className="score flex flex-around">
                 <div className="common-score color2">
-                    得分: 21416
+                    得分: { this.props.score }
                 </div>
                 <div className="max-score color2">
                     最佳: 100000
@@ -78,7 +133,7 @@ const GameSquare = props => {
 class GameField extends React.Component {
 
     // 构造棋盘
-    renderSquare () {
+    initSquare () {
         const squares = this.props.squares.map((val,index) => {
             const squaresRow = val.map((valr,indexr) => {
               return (
@@ -98,13 +153,12 @@ class GameField extends React.Component {
     render () {
         return (
             <div className="gameSquare">
-                { this.renderSquare() }
+                { this.initSquare() }
             </div>
         )
     }
 }
-
-
+// 游戏根组件
 class Game2048 extends React.Component {
 
     constructor (props) {
@@ -115,30 +169,54 @@ class Game2048 extends React.Component {
                 Array(4).fill(null),
                 Array(4).fill(null),
                 Array(4).fill(null),
-            ]
+            ],
+            score: 0
         }
     }
-    // 向上
-    handleTop () {
-        
-        console.log('top')
-    }
-    // 向左
-    handleLeft () {
-        console.log('left')
-    }
-    // 向下
-    handleBottom () {
-        console.log('bottom')
-    }
-    // 向右
-    handleRight () {
-        console.log('right')
+    // 操作按钮逻辑
+    handleGame (way) {
+        let squares = this.state.squares.slice()
+        let score = this.state.score
+        switch (way) {
+            case 'top':
+                squares = newState(squares)
+                squares.forEach(val => {
+                    score += handleSquare(val)
+                })
+                squares = newState(squares)
+                break
+            case 'left':
+                squares.forEach(val => {
+                    score += handleSquare(val)
+                })
+                break
+            case 'bottom':
+                squares = newState(squares)
+                squares.forEach(val => {
+                    score += handleSquare(val)
+                    val = val.reverse()
+                })
+                squares = newState(squares)
+                break
+            case 'right':
+                squares.forEach(val => {
+                    score += handleSquare(val)
+                    val = val.reverse()
+                })
+                break
+            default: break                
+        }
+        let [a,b] = handleCoor(squares)
+        squares[a][b] = 2
+        this.setState({
+            squares: squares,
+            score: score
+        })
     }
     // 初始化游戏棋盘坐标
     componentWillMount () {
-        let [a,b] = randomCoor()
-        let [c,d] = randomCoor()
+        let [a,b] = randomCoor(0,2)
+        let [c,d] = randomCoor(2,4)
         const squares = this.state.squares.slice()
         squares[a][b] = 2
         squares[c][d] = 4
@@ -153,12 +231,14 @@ class Game2048 extends React.Component {
                     <GameField squares= { this.state.squares } />
                 </div>
                 <div className="game-right">
-                    <Score />
+                    <Score
+                        score = { this.state.score }
+                    />
                     <HandleBtn
-                        handleTop = { () => { this.handleTop() } }
-                        handleLeft = { () => { this.handleLeft() } }
-                        handleBottom = { () => { this.handleBottom() } }
-                        handleRight = { () => { this.handleRight() } }
+                        handleTop = { () => { this.handleGame('top') } }
+                        handleLeft = { () => { this.handleGame('left') } }
+                        handleBottom = { () => { this.handleGame('bottom') } }
+                        handleRight = { () => { this.handleGame('right') } }
                     />
                 </div>
             </div>
